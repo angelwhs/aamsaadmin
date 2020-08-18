@@ -131,6 +131,12 @@ const router = new Router({
                     meta: { title: "微信公众号", group: "apps", icon: "dashboard" },
                     component: () => import(/* webpackChunkName: "role" */ "@/views/settings/wechatinfo.vue")
                 },
+                {
+                    path: "/settings/cossettings",
+                    name: "COSManage",
+                    meta: { title: "COS云", group: "apps", icon: "dashboard" },
+                    component: () => import(/* webpackChunkName: "role" */ "@/views/settings/cossettings.vue")
+                },
 
                 //营销
                 {

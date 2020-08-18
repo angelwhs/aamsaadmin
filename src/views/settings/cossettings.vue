@@ -34,7 +34,9 @@
                             <thead>
                                 <tr>
                                     <th class="text-left">Id</th>
-                                    <th class="text-left">微信公众号名称</th>
+                                    <th class="text-left">COS平台</th>
+                                    <th class="text-left">桶</th>
+                                    <th class="text-left">区域</th>
                                     <th class="text-left">状态</th>
                                     <th class="text-left">操作</th>
                                 </tr>
@@ -43,7 +45,9 @@
                                 <template v-if="searchResult.list && searchResult.list.length > 0">
                                     <tr v-for="item in searchResult.list" :key="item.Id">
                                         <td>{{ item.Id }}</td>
-                                        <td>{{ item.WechatPublicNoName }}</td>
+                                        <td>{{ item.COSPlatform }}</td>
+                                        <td>{{ item.BucketName }}</td>
+                                        <td>{{ item.Region }}</td>
                                         <td>
                                             <v-icon size="20" v-if="!item.Enable" @click="confirmSetEnable(item)"
                                                 color="red lighten-2">
@@ -80,7 +84,8 @@
             </div>
 
             <!--创建/更新-->
-            <v-dialog v-model="updateDialog.isShow" persistent fullscreen hide-overlay transition="dialog-bottom-transition">
+            <v-dialog v-model="updateDialog.isShow" persistent fullscreen hide-overlay
+                transition="dialog-bottom-transition">
                 <v-card ref="form">
                     <v-toolbar dark color="primary">
                         <v-btn icon dark @click="updateDialog.isShow = false">
@@ -88,7 +93,7 @@
                         </v-btn>
                         <v-toolbar-title>
                             <span class="headline mr-4">{{updateItem.Id === 0 ? '新建' : '编辑'}}</span>
-                            <span>微信公众号</span>
+                            <span>COS云</span>
                         </v-toolbar-title>
                         <v-spacer></v-spacer>
                         <v-toolbar-items>
@@ -98,163 +103,122 @@
 
                     <v-card-text>
                         <v-container>
-                            <!--名称-->
-                            <!--微信公众号-->
+                            <!--COSPlatform-->
+                            <v-row>
+                                <v-col>
+                                    <v-select :items="COSPlatformList" dense label="COS平台" item-text="Name"
+                                        item-value="Name" placeholder="请选择COS平台" v-model="updateItem.COSPlatform">
+                                    </v-select>
+                                </v-col>
+                            </v-row>
 
-                            <!--微信公众号名称-->
-                            <!--微信公众号类型-->
+                            <!--SecretKey-->
+                            <!--AccessKey-->
                             <v-row>
                                 <v-col cols="12" md="6">
-                                    <v-text-field v-model="updateItem.WechatPublicNoName" dense label="微信公众号名称" placeholder="请输入微信公众号名称"
-                                        :rules="[() => !!updateItem.WechatPublicNoName || '不能为空.']" :error-messages="errorMessages"
-                                        ref="EntityWechatPublicNoName">
+                                    <v-text-field v-model="updateItem.SecretKey" dense label="SecretKey"
+                                        placeholder="请输入SecretKey" :error-messages="errorMessages"
+                                        ref="EntitySecretKey">
                                     </v-text-field>
                                 </v-col>
                                 <v-col cols="12" md="6">
-                                    <v-select :items="wechatPublicNoTypeList" dense label="微信公众号类型" item-text="Name" item-value="Id" placeholder="请选择微信公众号类型"
-                                    v-model="updateItem.WechatPublicNoType"></v-select>
+                                    <v-text-field v-model="updateItem.AccessKey" dense label="AccessKey"
+                                        placeholder="请输入AccessKey" :error-messages="errorMessages"
+                                        ref="EntityAccessKey">
+                                    </v-text-field>
                                 </v-col>
                             </v-row>
 
                             <!--AppId-->
-                            <!--AppSecret-->
-                            <!--EncodingAESKey-->
-                            <!--Token-->
-                            <!--EncryptMode-->
+                            <!--Region-->
+                            <!--BucketName-->
                             <v-row>
-                                <v-col cols="12" md="6">
+                                <v-col cols="12" md="4">
                                     <v-text-field v-model="updateItem.AppId" dense label="AppId" placeholder="请输入AppId"
                                         :error-messages="errorMessages" ref="EntityAppId">
                                     </v-text-field>
                                 </v-col>
-                                <v-col cols="12" md="6">
-                                    <v-text-field v-model="updateItem.AppSecret" dense label="AppSecret" placeholder="请输入AppSecret"
-                                        :error-messages="errorMessages" ref="EntityAppId">
+                                <v-col cols="12" md="4">
+                                    <v-text-field v-model="updateItem.Region" dense label="Region"
+                                        placeholder="请输入Region" :error-messages="errorMessages" ref="EntityRegion">
                                     </v-text-field>
                                 </v-col>
-                            </v-row>
-                            <v-row>
-                                <v-col cols="12" md="12">
-                                    <v-text-field v-model="updateItem.EncodingAESKey" dense label="EncodingAESKey" placeholder="请输入EncodingAESKey"
-                                        :error-messages="errorMessages" ref="EntityEncodingAESKey">
-                                    </v-text-field>
-                                </v-col>
-                            </v-row>
-                            <v-row>
-                                <v-col cols="12" md="12">
-                                    <v-text-field v-model="updateItem.Token" dense label="Token" placeholder="请输入Token"
-                                        :error-messages="errorMessages" ref="EntityToken">
-                                    </v-text-field>
-                                </v-col>
-                            </v-row>
-                            <v-row>
-                                <v-col cols="12" md="12">
-                                    <v-select :items="encryptModeList" dense label="加密类型" item-text="Name" item-value="Id" placeholder="请选择加密类型"
-                                    v-model="updateItem.EncryptMode"></v-select>
-                                </v-col>
-                            </v-row>
-
-                            <!--原始ID-->
-                            <v-row>
-                                <v-col cols="12" md="12">
-                                    <v-text-field v-model="updateItem.OriginalId" dense label="原始ID" placeholder="请输入原始ID"
-                                        :error-messages="errorMessages" ref="EntityOriginalId">
+                                <v-col cols="12" md="4">
+                                    <v-text-field v-model="updateItem.BucketName" dense label="BucketName"
+                                        placeholder="请输入BucketName" :error-messages="errorMessages"
+                                        ref="EntityBucketName">
                                     </v-text-field>
                                 </v-col>
                             </v-row>
 
-                            <!--二维码-->
+                            <!--Url-->
                             <v-row>
                                 <v-col cols="12" md="12">
-                                    <v-card outlined class="pr-4 pl-4 pb-4">
-                                        <v-card-title>
-                                            二维码
-                                        </v-card-title>
-                                        <template>
-                                            <template
-                                                v-if="updateItem.QRCode_PictureUrl && updateItem.QRCode_PictureUrl !== ''">
-                                                <v-img width="100%" height="200" contain
-                                                    :src="updateItem.QRCode_PictureUrl" aspect-ratio="1"
-                                                    ref="EntityQRCode_PictureUrl">
-                                                </v-img>
-                                            </template>
-                                            <template v-else>
-                                                <div class="d-flex justify-center align-center"
-                                                    style="width: 100%; height: 200px;">
-                                                    <span class="subtitle-1">请选择图片</span>
-                                                </div>
-                                            </template>
-                                            <input type="hidden" v-model="updateItem.QRCode_PictureId"
-                                                ref="EntityQRCode_PictureId" />
-                                            <div class="d-flex justify-center mt-2">
-                                                <v-btn
-                                                    @click="pictureSelectorShow('QRCode_PictureId', 'QRCode_PictureUrl')"
-                                                    class="mr-12" small color="light-blue darken-1" dark>
-                                                    选择图片
-                                                </v-btn>
-                                                <v-btn
-                                                    @click="updateItem.QRCode_PictureId=0;updateItem.QRCode_PictureUrl=''"
-                                                    small color="light-blue darken-1" dark>
-                                                    删除图片
-                                                </v-btn>
-                                            </div>
-                                        </template>
-
-                                    </v-card>
+                                    <v-text-field v-model="updateItem.Url" dense label="Url" placeholder="请输入Url"
+                                        :error-messages="errorMessages" ref="EntityUrl">
+                                    </v-text-field>
                                 </v-col>
                             </v-row>
 
-                            <!--头像-->
-                            <v-row>
-                                <v-col cols="12" md="12">
-                                    <v-card outlined class="pr-4 pl-4 pb-4">
-                                        <v-card-title>
-                                            头像
-                                        </v-card-title>
-                                        <template>
-                                            <template
-                                                v-if="updateItem.Head_PictureUrl && updateItem.Head_PictureUrl !== ''">
-                                                <v-img width="100%" height="200" contain
-                                                    :src="updateItem.Head_PictureUrl" aspect-ratio="1"
-                                                    ref="EntityHead_PictureUrl">
-                                                </v-img>
-                                            </template>
-                                            <template v-else>
-                                                <div class="d-flex justify-center align-center"
-                                                    style="width: 100%; height: 200px;">
-                                                    <span class="subtitle-1">请选择图片</span>
-                                                </div>
-                                            </template>
-                                            <input type="hidden" v-model="updateItem.Head_PictureId"
-                                                ref="EntityHead_PictureId" />
-                                            <div class="d-flex justify-center mt-2">
-                                                <v-btn
-                                                    @click="pictureSelectorShow('Head_PictureId', 'Head_PictureUrl')"
-                                                    class="mr-12" small color="light-blue darken-1" dark>
-                                                    选择图片
-                                                </v-btn>
-                                                <v-btn
-                                                    @click="updateItem.Head_PictureId=0;updateItem.Head_PictureUrl=''"
-                                                    small color="light-blue darken-1" dark>
-                                                    删除图片
-                                                </v-btn>
-                                            </div>
-                                        </template>
 
-                                    </v-card>
+                            <!--ConnectionTimeoutMs-->
+                            <!--ReadWriteTimeoutMs-->
+                            <!--DurationSecond-->
+                            <v-row>
+                                <v-col cols="12" md="4">
+                                    <v-text-field v-model="updateItem.ConnectionTimeoutMs" label="ConnectionTimeoutMs" dense placeholder="45000"
+                                        :error-messages="errorMessages" ref="EntityConnectionTimeoutMs" type="number">
+                                    </v-text-field>
+                                </v-col>
+                                <v-col cols="12" md="4">
+                                    <v-text-field v-model="updateItem.ReadWriteTimeoutMs" label="ReadWriteTimeoutMs" dense placeholder="45000"
+                                        :error-messages="errorMessages" ref="EntityReadWriteTimeoutMs" type="number">
+                                    </v-text-field>
+                                </v-col>
+                                <v-col cols="12" md="4">
+                                    <v-text-field v-model="updateItem.DurationSecond" label="DurationSecond" dense placeholder="600"
+                                        :error-messages="errorMessages" ref="EntityDurationSecond" type="number">
+                                    </v-text-field>
                                 </v-col>
                             </v-row>
-                            
+
+                            <!--ImagesPrefix-->
+                            <!--ThumbsPrefix-->
+                            <!--UploadedPrefix-->
+                            <v-row>
+                                <v-col cols="12" md="4">
+                                    <v-text-field v-model="updateItem.ImagesPrefix" dense label="ImagesPrefix" placeholder="请输入ImagesPrefix"
+                                        :error-messages="errorMessages" ref="EntityImagesPrefix">
+                                    </v-text-field>
+                                </v-col>
+                                <v-col cols="12" md="4">
+                                    <v-text-field v-model="updateItem.ThumbsPrefix" dense label="ThumbsPrefix"
+                                        placeholder="请输入ThumbsPrefix" :error-messages="errorMessages" ref="EntityThumbsPrefix">
+                                    </v-text-field>
+                                </v-col>
+                                <v-col cols="12" md="4">
+                                    <v-text-field v-model="updateItem.UploadedPrefix" dense label="UploadedPrefix"
+                                        placeholder="请输入UploadedPrefix" :error-messages="errorMessages"
+                                        ref="EntityUploadedPrefix">
+                                    </v-text-field>
+                                </v-col>
+                            </v-row>
+
+
+                            <!--IsDefault-->
                             <v-row>
                                 <v-col cols="12" md="4">
                                     <v-switch v-model="updateItem.Enable" label="是否启用"></v-switch>
                                 </v-col>
-                            </v-row>                            
+                                <v-col cols="12" md="4">
+                                    <v-switch v-model="updateItem.IsDefault" label="是否默认"></v-switch>
+                                </v-col>
+                            </v-row>
                         </v-container>
                     </v-card-text>
 
                 </v-card>
-                
+
             </v-dialog>
 
             <!--删除-->
@@ -311,7 +275,7 @@
 
     export default {
         components: {
-            PictureSelector,
+
         },
 
         data() {
@@ -373,6 +337,10 @@
                 deleteDialog: false,
                 setEnableDialog: false,
 
+                COSPlatformList: [
+                    {Name: 'Tencent COS'},
+                    {Name: 'Qiniu COS'},
+                ],
 
             }
         },
@@ -385,7 +353,7 @@
             search: function (pageIndex) {
                 this.loadingDialog.isShow = true;
 
-                this.getAxios('/api/identity/backend/wechatglobalinfo/list', {
+                this.getAxios('/api/media/backend/cossettings/list', {
                     searchName: this.searchModel.searchName,
                     pageIndex: pageIndex,
                     pageSize: this.searchResult.pageSize,
@@ -414,21 +382,20 @@
                 this.updateItem.Name = item.Name;
                 this.updateItem.Description = item.Description;
                 this.updateItem.Enable = item.Enable;
-                this.updateItem.SystemName= item.SystemName;
+                this.updateItem.COSPlatform = item.COSPlatform;
+                this.updateItem.SecretKey = item.SecretKey;
+                this.updateItem.AccessKey = item.AccessKey;
+                this.updateItem.Region = item.Region;
+                this.updateItem.BucketName = item.BucketName;
+                this.updateItem.Url = item.Url;
                 this.updateItem.AppId = item.AppId;
-                this.updateItem.AppSecret = item.AppSecret;
-                this.updateItem.EncodingAESKey = item.EncodingAESKey;
-                this.updateItem.Token = item.Token;
-                this.updateItem.EncryptMode = item.EncryptMode;
-                this.updateItem.WechatPublicNo = item.WechatPublicNo;
-                this.updateItem.WechatPublicNoName = item.WechatPublicNoName;
-                this.updateItem.WechatPublicNoType =item.WechatPublicNoType;
-                this.updateItem.OriginalId = item.OriginalId;
-                this.updateItem.Account = item.Account;
-                this.updateItem.QRCode_PictureId = item.QRCode_PictureId;
-                this.updateItem.Head_PictureId = item.Head_PictureId;
-                this.updateItem.QRCode_PictureUrl = item.QRCode_PictureUrl;
-                this.updateItem.Head_PictureUrl = item.Head_PictureUrl;
+                this.updateItem.ConnectionTimeoutMs = item.ConnectionTimeoutMs;
+                this.updateItem.ReadWriteTimeoutMs = item.ReadWriteTimeoutMs;
+                this.updateItem.ImagesPrefix = item.ImagesPrefix;
+                this.updateItem.ThumbsPrefix = item.ThumbsPrefix;
+                this.updateItem.DurationSecond = item.DurationSecond;
+                this.updateItem.UploadedPrefix = item.UploadedPrefix;
+                this.updateItem.IsDefault = item.IsDefault;
             },
 
             openCreate: function () {
@@ -436,21 +403,20 @@
                 this.updateItem.Name = '';
                 this.updateItem.Description = '';
                 this.updateItem.Enable = true;
-                this.updateItem.SystemName= '';
+                this.updateItem.COSPlatform = 'Tencent COS';
+                this.updateItem.SecretKey = '';
+                this.updateItem.AccessKey = '';
+                this.updateItem.Region = '';
+                this.updateItem.BucketName = '';
+                this.updateItem.Url = '';
                 this.updateItem.AppId = '';
-                this.updateItem.AppSecret = '';
-                this.updateItem.EncodingAESKey = '';
-                this.updateItem.Token = '';
-                this.updateItem.EncryptMode = '';
-                this.updateItem.WechatPublicNo = '';
-                this.updateItem.WechatPublicNoName = '';
-                this.updateItem.WechatPublicNoType = 0;
-                this.updateItem.OriginalId = '';
-                this.updateItem.Account = '';
-                this.updateItem.QRCode_PictureId = 0;
-                this.updateItem.Head_PictureId = 0;
-                this.updateItem.QRCode_PictureUrl = '';
-                this.updateItem.Head_PictureUrl = '';
+                this.updateItem.ConnectionTimeoutMs = 45000;
+                this.updateItem.ReadWriteTimeoutMs = 45000;
+                this.updateItem.ImagesPrefix = 'images';
+                this.updateItem.ThumbsPrefix = 'thumbs';
+                this.updateItem.DurationSecond = 600;
+                this.updateItem.UploadedPrefix = 'uploaded';
+                this.updateItem.IsDefault = true;
 
                 this.updateDialog.isShow = true;
             },
@@ -468,7 +434,7 @@
                 console.log(this.updateItem);
 
                 if (this.updateItem.Id === 0) {
-                    this.postAxios('/api/identity/backend/wechatglobalinfo/create', JSON.stringify(this.updateItem)).then((data) => {
+                    this.postAxios('/api/media/backend/cossettings/create', JSON.stringify(this.updateItem)).then((data) => {
                         if (data.errorcode === 0) {
                             this.loadingDialog.isShow = false;
                             this.updateDialog.isShow = false;
@@ -484,7 +450,7 @@
                         this.$toast.error('新增失败,请重新提交.', { x: 'center', y: 'top', timeout: 2000, showClose: true, });
                     });
                 } else if (this.updateItem.Id > 0) {
-                    this.postAxios('/api/identity/backend/wechatglobalinfo/edit', JSON.stringify(this.updateItem)).then((data) => {
+                    this.postAxios('/api/media/backend/cossettings/edit', JSON.stringify(this.updateItem)).then((data) => {
                         if (data.errorcode === 0) {
                             this.loadingDialog.isShow = false;
                             this.updateDialog.isShow = false;
@@ -516,7 +482,7 @@
                 this.loadingDialog.message = '正在提交数据...';
                 this.loadingDialog.isShow = true;
 
-                this.getAxios('/api/identity/backend/wechatglobalinfo/delete', { id: this.updateItem.Id, }).then((data) => {
+                this.getAxios('/api/media/backend/cossettings/delete', { id: this.updateItem.Id, }).then((data) => {
                     if (data.errorcode === 0) {
                         this.loadingDialog.isShow = false;
                         this.deleteDialog = false;
@@ -541,7 +507,7 @@
                 this.loadingDialog.message = '正在提交数据...';
                 this.loadingDialog.isShow = true;
 
-                this.getAxios('/api/identity/backend/wechatglobalinfo/setenable', { id: this.updateItem.Id, }).then((data) => {
+                this.getAxios('/api/media/backend/cossettings/setenable', { id: this.updateItem.Id, }).then((data) => {
                     if (data.errorcode === 0) {
                         this.loadingDialog.isShow = false;
                         this.setEnableDialog = false;
@@ -557,40 +523,9 @@
                 });
             },
 
-            //封面图片选择
-            pictureSelectorShowChange: function (val) {
-                this.imgSelectorSetting.show = val;
-            },
 
-            pictureSelectorShow: function (pictureField, pictureUrlField) {
-                this.imgSelectorSetting.pictureField = pictureField;
-                this.imgSelectorSetting.pictureUrlField = pictureUrlField;
-                this.imgSelectorSetting.show = true;
-            },
 
-            pictureSelectorConfirm: function (selectedItems, pictureField, pictureUrlField) {
-                if (!pictureField || pictureField === '' || !pictureUrlField || pictureUrlField === '') {
-                    return;
-                }
-                let selectItem = selectedItems[0];
-                // console.log(pictureUrlField);
-                // console.log(selectItem);
-                this.updateItem[pictureField] = selectItem.Id;
-                this.updateItem[pictureUrlField] = selectItem.ImageUrl;
-            },
-
-            gotoDepartmentList: function (item) {
-                if (!item) {
-                    return;
-                }
-
-                this.$router.push({
-                    name: 'CourseDepartmentManage',
-                    params: { id: item.Id },
-                });
-            },
-
-            getStatusName: function(status) {
+            getStatusName: function (status) {
                 return GetAuditStatusName(status);
             },
 
