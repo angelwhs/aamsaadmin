@@ -18,8 +18,13 @@
                         </v-file-input>
                     </v-col>
                     <v-col class="d-flex align-center" cols="12" md="2">
-                        <v-btn color="primary" @click="uploadFile">
-                            开始上传
+                        <v-btn color="primary" @click="uploadFile" :disabled="uploadFiles.length === 0">
+                            <template v-if="uploadFiles.length === 0">
+                                选择文件
+                            </template>
+                            <template v-else>
+                                开始上传
+                            </template>
                         </v-btn>
                     </v-col>
                 </v-row>
@@ -73,6 +78,15 @@
                 <v-btn color="primary" text @click="show = false">取消</v-btn>
                 <v-btn color="primary" @click="confirm()">确定</v-btn>
             </v-card-actions>
+
+            <v-overlay :value="uploading" :absolute="true">
+                <div class="d-flex justify-center ma-6">
+                    <v-progress-circular indeterminate size="64"></v-progress-circular>
+                </div>
+                <div class="d-flex justify-center ma-6">
+                    图片上传中
+                </div>
+            </v-overlay>
         </v-card>
     </v-dialog>
 </template>
@@ -122,6 +136,8 @@
                 uploadFiles: [],
 
                 show: this.isShow,
+
+                uploading: false,
 
                 mandatory: true,
                 selectedItemskey: [],
@@ -188,6 +204,8 @@
                     return;
                 }
 
+                this.uploading = true;
+
                 let file = this.uploadFiles;
                 //console.log(this.uploadFiles);
                 let dataFile = new FormData();
@@ -197,12 +215,17 @@
                     if (data.errorcode === 0) {
                         this.$toast.success('图片上传成功.', { x: 'center', y: 'top', timeout: 3000, showClose: true, });
                         this.uploadFiles = [];
+
+                        this.uploading = false;
+
                         this.search(0);
                     } else {
                         this.$toast.error('图片上传失败.' + data.errormsg, { x: 'center', y: 'top', timeout: 2000, showClose: true, });
+                        this.uploading = false;
                     }
                 }).catch((error) => {
                     this.$toast.error('图片上传失败.' + error.message, { x: 'center', y: 'top', timeout: 2000, showClose: true, });
+                    this.uploading = false;
                 });
             },
 

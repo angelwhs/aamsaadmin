@@ -86,7 +86,7 @@ const router = new Router({
                     component: () => import(/* webpackChunkName: "role" */ "@/views/cms/articlecomment.vue")
                 },
                 {
-                    path: "/cms/contentaudit",
+                    path: "/cms/audit",
                     name: "ArticleManage",
                     meta: { title: "审核管理", group: "apps", icon: "dashboard" },
                     component: () => import(/* webpackChunkName: "role" */ "@/views/cms/contentaudit.vue")

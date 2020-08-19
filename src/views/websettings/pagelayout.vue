@@ -90,7 +90,7 @@
             <v-dialog v-model="updateDialog.isShow" max-width="800px" persistent :disabled="saveLoading">
                 <v-card ref="form">
                     <v-card-title>
-                        <span class="headline mr-4">{{updateItem.Id === 0 ? '新建' : '编辑'}}</span><span>导航栏</span>
+                        <span class="headline mr-4">{{updateItem.Id === 0 ? '新建' : '编辑'}}</span><span>页面</span>
                     </v-card-title>
 
                     <v-card-text>
