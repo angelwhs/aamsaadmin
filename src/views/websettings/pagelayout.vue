@@ -34,6 +34,7 @@
                                 <tr>
                                     <th class="text-left">Id</th>
                                     <th class="text-left">排序</th>
+                                    <th class="text-left">标识</th>
                                     <th class="text-left">标题</th>
                                     <th class="text-left">布局类型</th>
                                     <th class="text-left">状态</th>
@@ -45,6 +46,7 @@
                                     <tr v-for="item in searchResult.list" :key="item.Id">
                                         <td>{{ item.Id }}</td>
                                         <td>{{ item.DisplayOrder }}</td>
+                                        <td>{{ item.Name }}</td>
                                         <td>{{ item.Title }}</td>
                                         <td>{{ getLayoutTypeName(item.LayoutType) }}</td>
                                         <td>
@@ -135,12 +137,17 @@
                             </v-row>
                             <v-row>
                                 <v-col cols="12" md="6">
+                                    <v-text-field v-model="updateItem.Name" label="标识"
+                                        :error-messages="errorMessages" ref="EntityName">
+                                    </v-text-field>
+                                </v-col>
+                                <v-col cols="12" md="3">
                                     <v-text-field v-model="updateItem.DisplayOrder" label="序号" ref="DisplayOrder"
                                         :error-messages="errorMessages"
                                         :rules="[() => !!updateItem.DisplayOrder || '不能为空.']">
                                     </v-text-field>
                                 </v-col>
-                                <v-col cols="12" md="6">
+                                <v-col cols="12" md="3">
                                     <v-switch v-model="updateItem.Enable" label="是否启用"></v-switch>
                                 </v-col>
                             </v-row>
