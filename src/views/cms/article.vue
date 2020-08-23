@@ -399,6 +399,7 @@
                     pageSize: 10,
                     list: [],
                     headers: [
+                        { text: 'Id', value: 'Id' },
                         { text: '排序', value: 'Sort' },
                         { text: '标题', value: 'Title' },
                         { text: '是否发布', value: 'IsPublish' },
