@@ -6,12 +6,12 @@
                     <v-row class="mx-auto ">
                         <v-col cols="12" md="6">
                             <v-select hide-details :items="schoolSelector.list" item-text="Title" item-value="Id"
-                                label="选择学校" return-object v-model="schoolSelector.selected" @change="loadGrades"
+                                label="选择学校" v-model="schoolSelector.selectedId" @change="loadGrades"
                                 class="ml-4 mr-4 mb-2"></v-select>
                         </v-col>
                         <v-col cols="12" md="6">
                             <v-select hide-details :items="gradesSelector.list" item-text="Title" item-value="Id"
-                                label="选择届" return-object v-model="gradesSelector.selected" clearable
+                                label="选择届" v-model="gradesSelector.selectedId" clearable
                                 class="ml-4 mr-4 mb-2"></v-select>
                         </v-col>
                     </v-row>
@@ -121,7 +121,7 @@
                         <v-container>
                             <!--学校信息-->
                             <v-row>
-                                <v-col v-if="schoolSelector.selected" cols="12" md="12">
+                                <v-col v-if="schoolSelector.selectedId" cols="12" md="12">
                                     <v-expansion-panels>
                                         <v-expansion-panel>
                                             <v-expansion-panel-header>学校：{{schoolSelector.selected.Title}}
@@ -137,7 +137,11 @@
 
                             <!--选择届-->
                             <v-row>
-
+                                <v-col cols="12" md="12">
+                                    <v-select hide-details :items="gradesSelector.list" item-text="Title" item-value="Id"
+                                        label="选择届" return-object v-model="gradesSelector.selectedId" clearable
+                                        class="ml-4 mr-4 mb-2"></v-select>
+                                </v-col>
                             </v-row>
 
                             <v-row>
@@ -347,12 +351,12 @@
 
                 schoolSelector: {
                     list: [],
-                    selected: null,
+                    selectedId: null,
                 },
 
                 gradesSelector: {
                     list: [],
-                    selected: null,
+                    selectedId: null,
                 },
             }
         },
@@ -437,6 +441,11 @@
             saveUpdate: function () {
                 if(!this.schoolSelector.selected || !this.schoolSelector.selected.Id || this.schoolSelector.selected.Id <= 0) {
                     this.$toast.error('请选择学校。', { x:'center',  y: 'top', timeout: 3000, showClose: true, });
+                    return;
+                }
+
+                if(!this.gradesSelector.selected || !this.gradesSelector.selected.Id || this.gradesSelector.selected.Id <= 0) {
+                    this.$toast.error('请选择届。', { x:'center',  y: 'top', timeout: 3000, showClose: true, });
                     return;
                 }
 
@@ -573,6 +582,8 @@
                         if(res.result && res.result.Data && res.result.Data.length > 0) {
                             this.schoolSelector.list = res.result.Data;
                             this.schoolSelector.selected = this.schoolSelector.list[0];
+
+                            this.loadGrades();
                         }
                     }
                 });
