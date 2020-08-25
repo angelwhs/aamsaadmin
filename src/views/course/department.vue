@@ -203,7 +203,7 @@
                                 </v-col>
                                 <v-col cols="12" md="4">
                                     <v-text-field v-model="updateItem.DisplayOrder" label="序号" ref="DisplayOrder"
-                                        :error-messages="errorMessages" >
+                                        :error-messages="errorMessages" type="number">
                                     </v-text-field>
                                 </v-col>
                                 <v-col cols="12" md="4">
