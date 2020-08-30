@@ -124,10 +124,10 @@
                                 <v-col v-if="schoolSelector.selectedId" cols="12" md="12">
                                     <v-expansion-panels>
                                         <v-expansion-panel>
-                                            <v-expansion-panel-header>学校：{{schoolSelector.selected.Title}}
+                                            <v-expansion-panel-header>学校：{{getSchoolById(schoolSelector.selectedId).Title}}
                                             </v-expansion-panel-header>
                                             <v-expansion-panel-content>
-                                                <p class="mb-1 grey--text text--darken-1">Id：{{schoolSelector.selected.Id}}
+                                                <p class="mb-1 grey--text text--darken-1">Id：{{getSchoolById(schoolSelector.selectedId).Id}}
                                                 </p>
                                             </v-expansion-panel-content>
                                         </v-expansion-panel>
@@ -581,12 +581,29 @@
                     if(res.errorcode === 0) {
                         if(res.result && res.result.Data && res.result.Data.length > 0) {
                             this.schoolSelector.list = res.result.Data;
-                            this.schoolSelector.selected = this.schoolSelector.list[0];
+                            this.schoolSelector.selectedId = this.schoolSelector.list[0].Id;
 
                             this.loadGrades();
                         }
                     }
                 });
+            },
+
+            getSchoolById(id) {
+                if(id <= 0) { return null; }
+
+                let school = null;
+
+                if(this.schoolSelector.list && this.schoolSelector.list.length > 0) {
+                    this.schoolSelector.list.forEach(v => {
+                        if(v.Id == id) {
+                            school = v;
+                            return;
+                        }
+                    })
+                }
+
+                return school;
             },
 
             loadGrades() {
