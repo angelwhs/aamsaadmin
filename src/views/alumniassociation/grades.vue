@@ -555,6 +555,8 @@
                         if(res.result && res.result.Data && res.result.Data.length > 0) {
                             this.schoolSelector.list = res.result.Data;
                             this.schoolSelector.selected = this.schoolSelector.list[0];
+
+                            this.search(0);
                         }
                     }
                 });

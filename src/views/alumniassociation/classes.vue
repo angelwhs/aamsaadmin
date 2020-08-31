@@ -137,10 +137,10 @@
 
                             <!--选择届-->
                             <v-row>
-                                <v-col cols="12" md="12">
+                                <v-col cols="12" md="6">
                                     <v-select hide-details :items="gradesSelector.list" item-text="Title" item-value="Id"
-                                        label="选择届" return-object v-model="gradesSelector.selectedId" clearable
-                                        class="ml-4 mr-4 mb-2"></v-select>
+                                        label="选择届" v-model="gradesSelector.selectedId" clearable
+                                        class=" mb-2"></v-select>
                                 </v-col>
                             </v-row>
 
@@ -197,11 +197,16 @@
 
                             </v-row>
                             <v-row>
-                                <v-col cols="12" md="4">
+                                <v-col cols="12" md="3">
                                     <v-switch v-model="updateItem.Enable" label="是否启用"></v-switch>
                                 </v-col>
-                                <v-col cols="12" md="4">
+                                <v-col cols="12" md="3">
                                     <v-text-field v-model="updateItem.DisplayOrder" label="序号" ref="DisplayOrder"
+                                        :error-messages="errorMessages" type="number">
+                                    </v-text-field>
+                                </v-col>
+                                <v-col cols="12" md="3">
+                                    <v-text-field v-model="updateItem.NumberOfPeople" label="班级人数（总）" ref="NumberOfPeople"
                                         :error-messages="errorMessages" type="number">
                                     </v-text-field>
                                 </v-col>
@@ -324,6 +329,17 @@
                     ImageThumb_PictureUrl: '',
                     Status: 1,
                     SchoolId: 0,
+                    GradesId: 0,
+                    NumberOfPeople: 0,
+
+                    Created: '',
+                    SchoolTitle: '',
+                    GradesTitle: '',
+                    MajorId: 0,
+                    MajorTitle: '',
+                    
+                    Students: [],
+                    Teachers: [],
                 },
 
                 updateDialog: {
@@ -370,7 +386,7 @@
         methods: {
             search: function (pageIndex) {
                 //判断是否已选择学校
-                if(!this.schoolSelector.selected || !this.schoolSelector.selected.Id || this.schoolSelector.selected.Id <= 0) {
+                if(!this.schoolSelector.selectedId || this.schoolSelector.selectedId <= 0) {
                     this.$toast.error('请选择学校。', { x:'center',  y: 'top', timeout: 3000, showClose: true, });
                     return;
                 }
@@ -378,7 +394,9 @@
                 this.loadingDialog.isShow = true;
 
                 this.getAxios('/api/aa/backend/classes/list', {
-                    schoolId: this.schoolSelector.selected ? this.schoolSelector.selected.Id : 0,
+                    schoolId: this.schoolSelector.selectedId ? this.schoolSelector.selectedId : 0,
+                    gradesId: this.gradesSelector.selectedId ? this.gradesSelector.selectedId : 0,
+                    majorId: 0,
                     searchName: this.searchModel.searchName,
                     pageIndex: pageIndex,
                     pageSize: this.searchResult.pageSize,
@@ -414,6 +432,15 @@
                 this.updateItem.ImageThumb_PictureUrl = item.ImageThumb_PictureUrl;
                 this.updateItem.Status = item.Status;
                 this.updateItem.SchoolId = item.SchoolId;
+                this.updateItem.GradesId = item.GradesId;
+                this.updateItem.NumberOfPeople = item.NumberOfPeople;
+                this.updateItem.Created = item.Created;
+                this.updateItem.SchoolTitle = item.SchoolTitle;
+                this.updateItem.GradesTitle = item.GradesTitle;
+                this.updateItem.MajorId = item.MajorId;
+                this.updateItem.MajorTitle = item.MajorTitle;
+
+                this.gradesSelector.selectedId = item.GradesId;
             },
 
             openCreate: function () {
@@ -427,7 +454,14 @@
                 this.updateItem.DisplayOrder = 0;
                 this.updateItem.ImageThumb_PictureUrl = '';
                 this.updateItem.Status = 1;
-                this.updateItem.SchoolId = 1;
+                this.updateItem.SchoolId = 0;
+                this.updateItem.GradesId = 0;
+                this.updateItem.NumberOfPeople = 0;
+                this.updateItem.Created = '';
+                this.updateItem.SchoolTitle = '';
+                this.updateItem.GradesTitle = '';
+                this.updateItem.MajorId = 0;
+                this.updateItem.MajorTitle = '';
 
                 this.updateDialog.isShow = true;
             },
@@ -439,12 +473,12 @@
             },
 
             saveUpdate: function () {
-                if(!this.schoolSelector.selected || !this.schoolSelector.selected.Id || this.schoolSelector.selected.Id <= 0) {
+                if(!this.schoolSelector.selectedId || this.schoolSelector.selectedId <= 0) {
                     this.$toast.error('请选择学校。', { x:'center',  y: 'top', timeout: 3000, showClose: true, });
                     return;
                 }
 
-                if(!this.gradesSelector.selected || !this.gradesSelector.selected.Id || this.gradesSelector.selected.Id <= 0) {
+                if(!this.gradesSelector.selectedId || this.gradesSelector.selectedId <= 0) {
                     this.$toast.error('请选择届。', { x:'center',  y: 'top', timeout: 3000, showClose: true, });
                     return;
                 }
@@ -452,7 +486,8 @@
                 this.loadingDialog.message = '正在提交数据...';
                 this.loadingDialog.isShow = true;
 
-                this.updateItem.SchoolId = this.schoolSelector.selected.Id;
+                this.updateItem.SchoolId = this.schoolSelector.selectedId;
+                this.updateItem.GradesId = this.gradesSelector.selectedId;
 
                 if (this.updateItem.Id === 0) {
                     this.postAxios('/api/aa/backend/classes/create', JSON.stringify(this.updateItem)).then((data) => {
@@ -607,14 +642,14 @@
             },
 
             loadGrades() {
-                if(!this.schoolSelector.selected || !this.schoolSelector.selected.Id || this.schoolSelector.selected.Id <= 0) {
+                if(!this.schoolSelector.selectedId || this.schoolSelector.selectedId <= 0) {
                     return;
                 }
 
                 this.gradesSelector.list = [];
                 this.gradesSelector.selected = null;
 
-                let schoolId = this.schoolSelector.selected.Id;
+                let schoolId = this.schoolSelector.selectedId;
 
                 this.getAxios('/api/aa/backend/grades/GetAllEnable', {
                     schoolId: schoolId,
